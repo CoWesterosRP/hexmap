@@ -1,0 +1,920 @@
+<!DOCTYPE html>
+<html style="height: 100%; margin: 0;">
+<head>
+<title>AWOIAF RP: HexMap</title>
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<link rel="stylesheet" href="scripts/leaflet/leaflet.css">
+
+<script src="scripts/leaflet/leaflet.js"></script>
+</head>
+
+
+
+<body style="height: 100%; margin: 0;">
+	
+<div id="map" style="width: 100%; height: 100%; background: #333333; margin: 0;"></div>
+
+<script type="text/javascript">
+
+//Variables
+var mapSW = [0, 8192], //will be arrays of pixels dimensions; add 1+max zoom variables x 256
+	mapNE = [8192, 0];
+
+// Declare Map Object
+var map = L.map('map').setView([0, 0], 2); //sets default view location [lat,lng],zoom
+
+// Reference the tiles
+L.tileLayer('maps/8192px HexMap1.1/{z}/{x}/{y}.png', { //directory location of map tiles
+	minZoom: 1, //Cannot zoom out past this point
+	maxZoom: 5, //prevents breaking when zooming in too far
+	continuousWorld: false,
+	noWrap: true, //makes single contained image
+	crs: L.CRS.Simple, //changes coordinate reference system to a simple one for pixel use
+}).addTo(map);
+
+map.setMaxBounds(new L.LatLngBounds(
+	map.unproject(mapSW, map.getMaxZoom()),
+	map.unproject(mapNE, map.getMaxZoom()),
+));
+
+
+// Search bar and function
+/*var search = var search = L.control.search({
+
+                 placeholder : 'Search',            //search input placeholder   
+                 minNumberOfCharacters : 0,         //min number of characters user has to type before search callback is called    
+                 searchOnEnter : true,              //search when user type enter  
+                 noResults : 'No Records Found',    //custom text when no result is found
+            
+                 search: function(control, value) {
+                     
+                     control.setResults([
+                         {title: 'Item 1'},
+                         {title: 'Item 2', icon: 'fa fa-search'},
+                         {title: 'Item 3', imgIcon: 'img/icon.png'},
+                         {title: 'Item with Super Long Text', icon: 'fa fa-search', imgIcon: 'img/icon.png'}
+                     ]);
+                     
+                 },
+                 
+                 selected: function(item) {
+                    console.log(item);
+                 }
+             });
+
+select.addTo(map);*/
+
+// Icons
+var klanding_icon = L.icon({
+	iconUrl: 'images/klanding-icon.png',
+	iconSize: [38, 36],
+	iconAnchor: [19, 36],
+	popupAnchor: [0, -36],
+	shadowUrl: 'images/klanding-icon-shadow.png',
+	shadowSize: [51, 23],
+	shadowAnchor: [15, 23]
+})
+
+var wfell_icon = L.icon({
+	iconUrl: 'images/wfell-icon.png',
+	iconSize: [36, 25],
+	iconAnchor: [18, 25],
+	popupAnchor: [0, -25],
+	shadowUrl: 'images/wfell-icon-shadow.png',
+	shadowSize: [55, 23],
+	shadowAnchor: [18, 23]
+})
+
+var pyke_icon = L.icon({
+	iconUrl: 'images/pyke-icon.png',
+	iconSize: [38, 35],
+	iconAnchor: [19, 35],
+	popupAnchor: [0, -35],
+	shadowUrl: 'images/pyke-icon-shadow.png',
+	shadowSize: [55, 33],
+	shadowAnchor: [19, 33]
+})
+
+var crock_icon = L.icon({
+	iconUrl: 'images/crock-icon.png',
+	iconSize: [36, 27],
+	iconAnchor: [18, 27],
+	popupAnchor: [0, -27],
+	shadowUrl: 'images/crock-icon-shadow.png',
+	shadowSize: [56, 30],
+	shadowAnchor: [18, 30]
+})
+
+var dstone_icon = L.icon({
+	iconUrl: 'images/dstone-icon.png',
+	iconSize: [35, 34],
+	iconAnchor: [16, 34],
+	popupAnchor: [0, -34],
+	shadowUrl: 'images/dstone-icon-shadow.png',
+	shadowSize: [53, 33],
+	shadowAnchor: [16, 33]
+})
+
+var eyrie_icon = L.icon({
+	iconUrl: 'images/eyrie-icon.png',
+	iconSize: [36, 36],
+	iconAnchor: [18, 36],
+	popupAnchor: [0, -36],
+	shadowUrl: 'images/eyrie-icon-shadow.png',
+	shadowSize: [53, 27],
+	shadowAnchor: [18, 27]
+})
+
+var gotm_icon = L.icon({
+	iconUrl: 'images/gotm-icon.png',
+	iconSize: [27, 19],
+	iconAnchor: [14, 19],
+	popupAnchor: [0, -19],
+	shadowUrl: 'images/gotm-icon-shadow.png',
+	shadowSize: [51, 23],
+	shadowAnchor: [14, 23]
+})
+
+var hgarden_icon = L.icon({
+	iconUrl: 'images/hgarden-icon.png',
+	iconSize: [36, 36],
+	iconAnchor: [18, 36],
+	popupAnchor: [0, -36],
+	shadowUrl: 'images/hgarden-icon-shadow.png',
+	shadowSize: [57, 23],
+	shadowAnchor: [18, 23]
+})
+
+var hhal_icon = L.icon({
+	iconUrl: 'images/hhal-icon.png',
+	iconSize: [36, 36],
+	iconAnchor: [18, 36],
+	popupAnchor: [0, -36],
+	shadowUrl: 'images/hhal-icon-shadow.png',
+	shadowSize: [50, 27],
+	shadowAnchor: [18, 27]
+})
+
+var otown_icon = L.icon({
+	iconUrl: 'images/otown-icon.png',
+	iconSize: [36, 34],
+	iconAnchor: [18, 34],
+	popupAnchor: [0, -34],
+	shadowUrl: 'images/otown-icon-shadow.png',
+	shadowSize: [56, 30],
+	shadowAnchor: [18, 30]
+})
+
+var rrun_icon = L.icon({
+	iconUrl: 'images/rrun-icon.png',
+	iconSize: [37, 35],
+	iconAnchor: [19, 35],
+	popupAnchor: [0, -35],
+	shadowUrl: 'images/rrun-icon-shadow.png',
+	shadowSize: [54, 30],
+	shadowAnchor: [19, 30]
+})
+
+var ruins_icon = L.icon({
+	iconUrl: 'images/ruins-icon.png',
+	iconSize: [36, 19],
+	iconAnchor: [18, 19],
+	popupAnchor: [0, -19],
+	shadowUrl: 'images/ruins-icon-shadow.png',
+	shadowSize: [54, 18],
+	shadowAnchor: [18, 18]
+})
+
+var send_icon = L.icon({
+	iconUrl: 'images/send-icon.png',
+	iconSize: [36, 34],
+	iconAnchor: [18, 34],
+	popupAnchor: [0, -34],
+	shadowUrl: 'images/send-icon-shadow.png',
+	shadowSize: [53, 30],
+	shadowAnchor: [20, 30]
+})
+
+var shall_icon = L.icon({
+	iconUrl: 'images/shall-icon.png',
+	iconSize: [36, 35],
+	iconAnchor: [18, 35],
+	popupAnchor: [0, -35],
+	shadowUrl: 'images/shall-icon-shadow.png',
+	shadowSize: [50, 30],
+	shadowAnchor: [18, 30]
+})
+
+var sspear_icon = L.icon({
+	iconUrl: 'images/sspear-icon.png',
+	iconSize: [32, 37],
+	iconAnchor: [16, 37],
+	popupAnchor: [0, -37],
+	shadowUrl: 'images/sspear-icon-shadow.png',
+	shadowSize: [52, 30],
+	shadowAnchor: [18, 30]
+})
+
+var twins_icon = L.icon({
+	iconUrl: 'images/twins-icon.png',
+	iconSize: [31, 25],
+	iconAnchor: [16, 25],
+	popupAnchor: [0, -25],
+	shadowUrl: 'images/twins-icon-shadow.png',
+	shadowSize: [45, 23],
+	shadowAnchor: [16, 23]
+})
+
+var rank1_icon = L.icon({
+	iconUrl: 'images/rank1-icon.png',
+	iconSize: [19, 21],
+	iconAnchor: [10, 21],
+	popupAnchor: [0, -21],
+	shadowUrl: 'images/rank1-icon-shadow.png',
+	shadowSize: [36, 20],
+	shadowAnchor: [10, 20]
+})
+
+var rank2_icon = L.icon({
+	iconUrl: 'images/rank2-icon.png',
+	iconSize: [29, 22],
+	iconAnchor: [15, 22],
+	popupAnchor: [0, -22],
+	shadowUrl: 'images/rank2-icon-shadow.png',
+	shadowSize: [48, 24],
+	shadowAnchor: [15, 24]
+})
+
+var rank3_icon = L.icon({
+	iconUrl: 'images/rank3-icon.png',
+	iconSize: [27, 28],
+	iconAnchor: [13, 28],
+	popupAnchor: [0, -28],
+	shadowUrl: 'images/rank3-icon-shadow.png',
+	shadowSize: [47, 22],
+	shadowAnchor: [15, 20]
+})
+
+
+
+
+// Markers and Popups
+// LatLng
+//--- Movable Reference Marker to determine pixel coordinates for House placement ---//
+var refmarker = L.marker([84, -115], { //creates marker object called 'marker' at [lat,lng]
+	draggable: true, //makes the marker draggable
+})
+.addTo(map); //actually places onto map
+refmarker.bindPopup('Drag this marker to learn coordinates!').openPopup(); //attaches popup object to this marker
+
+refmarker.on('dragend', function(e) {
+	refmarker.getPopup().setContent('Pixels ' + map.project(refmarker.getLatLng(), map.getMaxZoom().toString()))
+	.openOn(map);
+})
+
+
+
+
+
+// Pixels
+//-----MARKER PLACEMENTS-----//
+// The Wall and Beyond
+
+
+// The North
+var winterfell = L.marker(map.unproject([3973, 1998], map.getMaxZoom()), {icon: wfell_icon});
+winterfell.bindPopup('<b>House Stark</b><br><b>Seat: Winterfell</b>');
+winterfell.on('mouseover', function (e) {this.openPopup();});
+winterfell.on('mouseout', function (e) {this.closePopup();});
+
+	// Greater Houses
+	var barrowton = L.marker(map.unproject([3394, 2738], map.getMaxZoom()), {icon: rank3_icon});
+	barrowton.bindPopup('<b>Barrowton</b>');
+	barrowton.on('mouseover', function (e) {this.openPopup();});
+	barrowton.on('mouseout', function (e) {this.closePopup();});
+
+	var dmotte = L.marker(map.unproject([3362, 1660], map.getMaxZoom()), {icon: rank3_icon});
+	dmotte.bindPopup('<b>Deepwood Motte</b>');
+	dmotte.on('mouseover', function (e) {this.openPopup();});
+	dmotte.on('mouseout', function (e) {this.closePopup();});
+
+	var hornwood = L.marker(map.unproject([4672, 2165], map.getMaxZoom()), {icon: rank3_icon});
+	hornwood.bindPopup('<b>Hornwood</b>');
+	hornwood.on('mouseover', function (e) {this.openPopup();});
+	hornwood.on('mouseout', function (e) {this.closePopup();});
+
+	var karhold = L.marker(map.unproject([5366, 1550], map.getMaxZoom()), {icon: rank3_icon});
+	karhold.bindPopup('<b>Karhold</b>');
+	karhold.on('mouseover', function (e) {this.openPopup();});
+	karhold.on('mouseout', function (e) {this.closePopup();});
+
+	var wharbor = L.marker(map.unproject([4440, 2842], map.getMaxZoom()), {icon: rank3_icon});
+	wharbor.bindPopup('<b>White Harbor</b>');
+	wharbor.on('mouseover', function (e) {this.openPopup();});
+	wharbor.on('mouseout', function (e) {this.closePopup();});
+
+	var bisland = L.marker(map.unproject([3274, 1156], map.getMaxZoom()), {icon: rank3_icon});
+	bisland.bindPopup('<b>Bear Island</b>');
+	bisland.on('mouseover', function (e) {this.openPopup();});
+	bisland.on('mouseout', function (e) {this.closePopup();});
+
+	var gwatch = L.marker(map.unproject([3874, 3526], map.getMaxZoom()), {icon: rank3_icon});
+	gwatch.bindPopup('<b>Greywater Watch</b>');
+	gwatch.on('mouseover', function (e) {this.openPopup();});
+	gwatch.on('mouseout', function (e) {this.closePopup();});
+
+	var rills = L.marker(map.unproject([2818, 2792], map.getMaxZoom()), {icon: rank3_icon});
+	rills.bindPopup('<b>The Rills</b>');
+	rills.on('mouseover', function (e) {this.openPopup();});
+	rills.on('mouseout', function (e) {this.closePopup();});
+
+	var dreadfort = L.marker(map.unproject([4822, 1886], map.getMaxZoom()), {icon: rank3_icon});
+	dreadfort.bindPopup('<b>Dreadfort</b>');
+	dreadfort.on('mouseover', function (e) {this.openPopup();});
+	dreadfort.on('mouseout', function (e) {this.closePopup();});
+
+	var lhearth = L.marker(map.unproject([4638, 1208], map.getMaxZoom()), {icon: rank3_icon});
+	lhearth.bindPopup('<b>Last Hearth</b>');
+	lhearth.on('mouseover', function (e) {this.openPopup();});
+	lhearth.on('mouseout', function (e) {this.closePopup();});
+
+	// Lesser Houses
+
+
+
+
+
+// The Iron Islands
+var pyke = L.marker(map.unproject([2819, 4267], map.getMaxZoom()), {icon: pyke_icon});
+pyke.bindPopup('<b>House Greyjoy</b><br><b>Seat: Pyke</b>');
+pyke.on('mouseover', function (e) {this.openPopup();});
+pyke.on('mouseout', function (e) {this.closePopup();});
+
+/*
+	// Greater Houses
+	var btcastle = L.marker(map.unproject([3973, 1998], map.getMaxZoom()), {icon: rank3_icon});
+	btcastle.bindPopup('<b>Seat: Blacktyde Castle</b>');
+	btcastle.on('mouseover', function (e) {this.openPopup();});
+	btcastle.on('mouseout', function (e) {this.closePopup();});
+
+	var lordsport = L.marker(map.unproject([3973, 1998], map.getMaxZoom()), {icon: rank3_icon});
+	lordsport.bindPopup('<b>Seat: Lordsport</b>');
+	lordsport.on('mouseover', function (e) {this.openPopup();});
+	lordsport.on('mouseout', function (e) {this.closePopup();});
+
+	var owyk = L.marker(map.unproject([3973, 1998], map.getMaxZoom()), {icon: rank3_icon});
+	owyk.bindPopup('<b>Seat: Old Wyk</b>');
+	owyk.on('mouseover', function (e) {this.openPopup();});
+	owyk.on('mouseout', function (e) {this.closePopup();});
+
+	var llight = L.marker(map.unproject([3973, 1998], map.getMaxZoom()), {icon: rank3_icon});
+	llight.bindPopup('<b>Seat: Lonely Light</b>');
+	llight.on('mouseover', function (e) {this.openPopup();});
+	llight.on('mouseout', function (e) {this.closePopup();});
+
+	var spoint = L.marker(map.unproject([3973, 1998], map.getMaxZoom()), {icon: rank3_icon});
+	spoint.bindPopup('<b>Seat: Sealskin Point</b>');
+	spoint.on('mouseover', function (e) {this.openPopup();});
+	spoint.on('mouseout', function (e) {this.closePopup();});
+
+	var hhorn = L.marker(map.unproject([3973, 1998], map.getMaxZoom()), {icon: rank3_icon});
+	hhorn.bindPopup('<b>Seat: Hammerhorn</b>');
+	hhorn.on('mouseover', function (e) {this.openPopup();});
+	hhorn.on('mouseout', function (e) {this.closePopup();});
+
+	var ttowers = L.marker(map.unproject([3973, 1998], map.getMaxZoom()), {icon: rank3_icon});
+	ttowers.bindPopup('<b>Seat: Ten Towers</b>');
+	ttowers.on('mouseover', function (e) {this.openPopup();});
+	ttowers.on('mouseout', function (e) {this.closePopup();});
+
+	var ptower = L.marker(map.unproject([3973, 1998], map.getMaxZoom()), {icon: rank3_icon});
+	ptower.bindPopup('<b>Seat: Pebbleton Towers</b>');
+	ptower.on('mouseover', function (e) {this.openPopup();});
+	ptower.on('mouseout', function (e) {this.closePopup();});
+
+	var orkmont = L.marker(map.unproject([3973, 1998], map.getMaxZoom()), {icon: rank3_icon});
+	orkmont.bindPopup('<b>Seat: Orkmont</b>');
+	orkmont.on('mouseover', function (e) {this.openPopup();});
+	orkmont.on('mouseout', function (e) {this.closePopup();});
+
+	var hstonehouse = L.marker(map.unproject([3973, 1998], map.getMaxZoom()), {icon: rank3_icon});
+	hstonehouse.bindPopup('<b>House Stonehouse</b>');
+	hstonehouse.on('mouseover', function (e) {this.openPopup();});
+	hstonehouse.on('mouseout', function (e) {this.closePopup();});
+
+	var scliffe = L.marker(map.unproject([3973, 1998], map.getMaxZoom()), {icon: rank3_icon});
+	scliffe.bindPopup('<b>Seat: Saltcliffe</b>');
+	scliffe.on('mouseover', function (e) {this.openPopup();});
+	scliffe.on('mouseout', function (e) {this.closePopup();});
+
+	var htawney = L.marker(map.unproject([3973, 1998], map.getMaxZoom()), {icon: rank3_icon});
+	htawney.bindPopup('<b>House Tawney</b>');
+	htawney.on('mouseover', function (e) {this.openPopup();});
+	htawney.on('mouseout', function (e) {this.closePopup();});
+
+	var iholt = L.marker(map.unproject([3973, 1998], map.getMaxZoom()), {icon: rank3_icon});
+	iholt.bindPopup('<b>Seat: Iron Holt</b>');
+	iholt.on('mouseover', function (e) {this.openPopup();});
+	iholt.on('mouseout', function (e) {this.closePopup();});
+
+
+	// Lesser Houses
+	
+	
+	*/
+	
+
+// The Riverlands
+var rrun = L.marker(map.unproject([3728, 4608], map.getMaxZoom()), {icon: rrun_icon});
+rrun.bindPopup('<b>House Tully</b><br><b>Seat: River Run</b>');
+rrun.on('mouseover', function (e) {this.openPopup();});
+rrun.on('mouseout', function (e) {this.closePopup();});
+
+/*
+	// Greater Houses
+	var barrowton = L.marker(map.unproject([3973, 1998], map.getMaxZoom()));
+	barrowton.bindPopup('<b>Barrowton</b>');
+	barrowton.on('mouseover', function (e) {this.openPopup();});
+	barrowton.on('mouseout', function (e) {this.closePopup();});
+
+	var dmotte = L.marker(map.unproject([3973, 1998], map.getMaxZoom()));
+	dmotte.bindPopup('<b>Deepwood Motte</b>');
+	dmotte.on('mouseover', function (e) {this.openPopup();});
+	dmotte.on('mouseout', function (e) {this.closePopup();});
+
+	var hornwood = L.marker(map.unproject([3973, 1998], map.getMaxZoom()));
+	hornwood.bindPopup('<b>Hornwood</b>');
+	hornwood.on('mouseover', function (e) {this.openPopup();});
+	hornwood.on('mouseout', function (e) {this.closePopup();});
+
+	var karhold = L.marker(map.unproject([3973, 1998], map.getMaxZoom()));
+	karhold.bindPopup('<b>Karhold</b>');
+	karhold.on('mouseover', function (e) {this.openPopup();});
+	karhold.on('mouseout', function (e) {this.closePopup();});
+
+	var wharbor = L.marker(map.unproject([3973, 1998], map.getMaxZoom()));
+	wharbor.bindPopup('<b>White Harbor</b>');
+	wharbor.on('mouseover', function (e) {this.openPopup();});
+	wharbor.on('mouseout', function (e) {this.closePopup();});
+
+	var bisland = L.marker(map.unproject([3973, 1998], map.getMaxZoom()));
+	bisland.bindPopup('<b>Bear Island</b>');
+	bisland.on('mouseover', function (e) {this.openPopup();});
+	bisland.on('mouseout', function (e) {this.closePopup();});
+
+	var gwatch = L.marker(map.unproject([3973, 1998], map.getMaxZoom()));
+	gwatch.bindPopup('<b>Greywater Watch</b>');
+	gwatch.on('mouseover', function (e) {this.openPopup();});
+	gwatch.on('mouseout', function (e) {this.closePopup();});
+
+	var rills = L.marker(map.unproject([3973, 1998], map.getMaxZoom()));
+	rills.bindPopup('<b>The Rills</b>');
+	rills.on('mouseover', function (e) {this.openPopup();});
+	rills.on('mouseout', function (e) {this.closePopup();});
+
+	var dreadfort = L.marker(map.unproject([3973, 1998], map.getMaxZoom()));
+	dreadfort.bindPopup('<b>Dreadfort</b>');
+	dreadfort.on('mouseover', function (e) {this.openPopup();});
+	dreadfort.on('mouseout', function (e) {this.closePopup();});
+
+	var lhearth = L.marker(map.unproject([3973, 1998], map.getMaxZoom()));
+	lhearth.bindPopup('<b>Last Hearth</b>');
+	lhearth.on('mouseover', function (e) {this.openPopup();});
+	lhearth.on('mouseout', function (e) {this.closePopup();});
+
+	// Lesser Houses
+	
+	
+	*/
+	
+
+// The Vale
+var eyrie = L.marker(map.unproject([4852, 4103], map.getMaxZoom()), {icon: eyrie_icon});
+eyrie.bindPopup('<b>House Arryn</b><br><b>Seat: The Eyrie</b>');
+eyrie.on('mouseover', function (e) {this.openPopup();});
+eyrie.on('mouseout', function (e) {this.closePopup();});
+
+/*
+	// Greater Houses
+	var barrowton = L.marker(map.unproject([3973, 1998], map.getMaxZoom()));
+	barrowton.bindPopup('<b>Barrowton</b>');
+	barrowton.on('mouseover', function (e) {this.openPopup();});
+	barrowton.on('mouseout', function (e) {this.closePopup();});
+
+	var dmotte = L.marker(map.unproject([3973, 1998], map.getMaxZoom()));
+	dmotte.bindPopup('<b>Deepwood Motte</b>');
+	dmotte.on('mouseover', function (e) {this.openPopup();});
+	dmotte.on('mouseout', function (e) {this.closePopup();});
+
+	var hornwood = L.marker(map.unproject([3973, 1998], map.getMaxZoom()));
+	hornwood.bindPopup('<b>Hornwood</b>');
+	hornwood.on('mouseover', function (e) {this.openPopup();});
+	hornwood.on('mouseout', function (e) {this.closePopup();});
+
+	var karhold = L.marker(map.unproject([3973, 1998], map.getMaxZoom()));
+	karhold.bindPopup('<b>Karhold</b>');
+	karhold.on('mouseover', function (e) {this.openPopup();});
+	karhold.on('mouseout', function (e) {this.closePopup();});
+
+	var wharbor = L.marker(map.unproject([3973, 1998], map.getMaxZoom()));
+	wharbor.bindPopup('<b>White Harbor</b>');
+	wharbor.on('mouseover', function (e) {this.openPopup();});
+	wharbor.on('mouseout', function (e) {this.closePopup();});
+
+	var bisland = L.marker(map.unproject([3973, 1998], map.getMaxZoom()));
+	bisland.bindPopup('<b>Bear Island</b>');
+	bisland.on('mouseover', function (e) {this.openPopup();});
+	bisland.on('mouseout', function (e) {this.closePopup();});
+
+	var gwatch = L.marker(map.unproject([3973, 1998], map.getMaxZoom()));
+	gwatch.bindPopup('<b>Greywater Watch</b>');
+	gwatch.on('mouseover', function (e) {this.openPopup();});
+	gwatch.on('mouseout', function (e) {this.closePopup();});
+
+	var rills = L.marker(map.unproject([3973, 1998], map.getMaxZoom()));
+	rills.bindPopup('<b>The Rills</b>');
+	rills.on('mouseover', function (e) {this.openPopup();});
+	rills.on('mouseout', function (e) {this.closePopup();});
+
+	var dreadfort = L.marker(map.unproject([3973, 1998], map.getMaxZoom()));
+	dreadfort.bindPopup('<b>Dreadfort</b>');
+	dreadfort.on('mouseover', function (e) {this.openPopup();});
+	dreadfort.on('mouseout', function (e) {this.closePopup();});
+
+	var lhearth = L.marker(map.unproject([3973, 1998], map.getMaxZoom()));
+	lhearth.bindPopup('<b>Last Hearth</b>');
+	lhearth.on('mouseover', function (e) {this.openPopup();});
+	lhearth.on('mouseout', function (e) {this.closePopup();});
+
+	// Lesser Houses
+	
+	*/
+	
+	
+
+// The Westerlands
+var crock = L.marker(map.unproject([2797, 5121], map.getMaxZoom()), {icon: crock_icon});
+crock.bindPopup('<b>House Lannister</b><br><b>Seat: Casterly Rock</b>');
+crock.on('mouseover', function (e) {this.openPopup();});
+crock.on('mouseout', function (e) {this.closePopup();});
+
+/*
+	// Greater Houses
+	var barrowton = L.marker(map.unproject([3973, 1998], map.getMaxZoom()));
+	barrowton.bindPopup('<b>Barrowton</b>');
+	barrowton.on('mouseover', function (e) {this.openPopup();});
+	barrowton.on('mouseout', function (e) {this.closePopup();});
+
+	var dmotte = L.marker(map.unproject([3973, 1998], map.getMaxZoom()));
+	dmotte.bindPopup('<b>Deepwood Motte</b>');
+	dmotte.on('mouseover', function (e) {this.openPopup();});
+	dmotte.on('mouseout', function (e) {this.closePopup();});
+
+	var hornwood = L.marker(map.unproject([3973, 1998], map.getMaxZoom()));
+	hornwood.bindPopup('<b>Hornwood</b>');
+	hornwood.on('mouseover', function (e) {this.openPopup();});
+	hornwood.on('mouseout', function (e) {this.closePopup();});
+
+	var karhold = L.marker(map.unproject([3973, 1998], map.getMaxZoom()));
+	karhold.bindPopup('<b>Karhold</b>');
+	karhold.on('mouseover', function (e) {this.openPopup();});
+	karhold.on('mouseout', function (e) {this.closePopup();});
+
+	var wharbor = L.marker(map.unproject([3973, 1998], map.getMaxZoom()));
+	wharbor.bindPopup('<b>White Harbor</b>');
+	wharbor.on('mouseover', function (e) {this.openPopup();});
+	wharbor.on('mouseout', function (e) {this.closePopup();});
+
+	var bisland = L.marker(map.unproject([3973, 1998], map.getMaxZoom()));
+	bisland.bindPopup('<b>Bear Island</b>');
+	bisland.on('mouseover', function (e) {this.openPopup();});
+	bisland.on('mouseout', function (e) {this.closePopup();});
+
+	var gwatch = L.marker(map.unproject([3973, 1998], map.getMaxZoom()));
+	gwatch.bindPopup('<b>Greywater Watch</b>');
+	gwatch.on('mouseover', function (e) {this.openPopup();});
+	gwatch.on('mouseout', function (e) {this.closePopup();});
+
+	var rills = L.marker(map.unproject([3973, 1998], map.getMaxZoom()));
+	rills.bindPopup('<b>The Rills</b>');
+	rills.on('mouseover', function (e) {this.openPopup();});
+	rills.on('mouseout', function (e) {this.closePopup();});
+
+	var dreadfort = L.marker(map.unproject([3973, 1998], map.getMaxZoom()));
+	dreadfort.bindPopup('<b>Dreadfort</b>');
+	dreadfort.on('mouseover', function (e) {this.openPopup();});
+	dreadfort.on('mouseout', function (e) {this.closePopup();});
+
+	var lhearth = L.marker(map.unproject([3973, 1998], map.getMaxZoom()));
+	lhearth.bindPopup('<b>Last Hearth</b>');
+	lhearth.on('mouseover', function (e) {this.openPopup();});
+	lhearth.on('mouseout', function (e) {this.closePopup();});
+
+	// Lesser Houses
+	
+	
+	*/
+	
+
+// The Reach
+var hgarden = L.marker(map.unproject([3271, 6373], map.getMaxZoom()), {icon: hgarden_icon});
+hgarden.bindPopup('<b>House Tyrell</b><br><b>Seat: Highgarden</b>');
+hgarden.on('mouseover', function (e) {this.openPopup();});
+hgarden.on('mouseout', function (e) {this.closePopup();});
+
+/*
+	// Greater Houses
+	var barrowton = L.marker(map.unproject([3973, 1998], map.getMaxZoom()));
+	barrowton.bindPopup('<b>Barrowton</b>');
+	barrowton.on('mouseover', function (e) {this.openPopup();});
+	barrowton.on('mouseout', function (e) {this.closePopup();});
+
+	var dmotte = L.marker(map.unproject([3973, 1998], map.getMaxZoom()));
+	dmotte.bindPopup('<b>Deepwood Motte</b>');
+	dmotte.on('mouseover', function (e) {this.openPopup();});
+	dmotte.on('mouseout', function (e) {this.closePopup();});
+
+	var hornwood = L.marker(map.unproject([3973, 1998], map.getMaxZoom()));
+	hornwood.bindPopup('<b>Hornwood</b>');
+	hornwood.on('mouseover', function (e) {this.openPopup();});
+	hornwood.on('mouseout', function (e) {this.closePopup();});
+
+	var karhold = L.marker(map.unproject([3973, 1998], map.getMaxZoom()));
+	karhold.bindPopup('<b>Karhold</b>');
+	karhold.on('mouseover', function (e) {this.openPopup();});
+	karhold.on('mouseout', function (e) {this.closePopup();});
+
+	var wharbor = L.marker(map.unproject([3973, 1998], map.getMaxZoom()));
+	wharbor.bindPopup('<b>White Harbor</b>');
+	wharbor.on('mouseover', function (e) {this.openPopup();});
+	wharbor.on('mouseout', function (e) {this.closePopup();});
+
+	var bisland = L.marker(map.unproject([3973, 1998], map.getMaxZoom()));
+	bisland.bindPopup('<b>Bear Island</b>');
+	bisland.on('mouseover', function (e) {this.openPopup();});
+	bisland.on('mouseout', function (e) {this.closePopup();});
+
+	var gwatch = L.marker(map.unproject([3973, 1998], map.getMaxZoom()));
+	gwatch.bindPopup('<b>Greywater Watch</b>');
+	gwatch.on('mouseover', function (e) {this.openPopup();});
+	gwatch.on('mouseout', function (e) {this.closePopup();});
+
+	var rills = L.marker(map.unproject([3973, 1998], map.getMaxZoom()));
+	rills.bindPopup('<b>The Rills</b>');
+	rills.on('mouseover', function (e) {this.openPopup();});
+	rills.on('mouseout', function (e) {this.closePopup();});
+
+	var dreadfort = L.marker(map.unproject([3973, 1998], map.getMaxZoom()));
+	dreadfort.bindPopup('<b>Dreadfort</b>');
+	dreadfort.on('mouseover', function (e) {this.openPopup();});
+	dreadfort.on('mouseout', function (e) {this.closePopup();});
+
+	var lhearth = L.marker(map.unproject([3973, 1998], map.getMaxZoom()));
+	lhearth.bindPopup('<b>Last Hearth</b>');
+	lhearth.on('mouseover', function (e) {this.openPopup();});
+	lhearth.on('mouseout', function (e) {this.closePopup();});
+
+	// Lesser Houses
+	
+	
+*/	
+	
+
+// The Crownlands
+var klanding = L.marker(map.unproject([4638, 5410], map.getMaxZoom()), {icon: klanding_icon});
+klanding.bindPopup("<b>House Targaryen</b><br><b>Seat: King's Landing</b>");
+klanding.on('mouseover', function (e) {this.openPopup();});
+klanding.on('mouseout', function (e) {this.closePopup();});
+
+
+/*
+	// Greater Houses
+	var barrowton = L.marker(map.unproject([3973, 1998], map.getMaxZoom()));
+	barrowton.bindPopup('<b>Barrowton</b>');
+	barrowton.on('mouseover', function (e) {this.openPopup();});
+	barrowton.on('mouseout', function (e) {this.closePopup();});
+
+	var dmotte = L.marker(map.unproject([3973, 1998], map.getMaxZoom()));
+	dmotte.bindPopup('<b>Deepwood Motte</b>');
+	dmotte.on('mouseover', function (e) {this.openPopup();});
+	dmotte.on('mouseout', function (e) {this.closePopup();});
+
+	var hornwood = L.marker(map.unproject([3973, 1998], map.getMaxZoom()));
+	hornwood.bindPopup('<b>Hornwood</b>');
+	hornwood.on('mouseover', function (e) {this.openPopup();});
+	hornwood.on('mouseout', function (e) {this.closePopup();});
+
+	var karhold = L.marker(map.unproject([3973, 1998], map.getMaxZoom()));
+	karhold.bindPopup('<b>Karhold</b>');
+	karhold.on('mouseover', function (e) {this.openPopup();});
+	karhold.on('mouseout', function (e) {this.closePopup();});
+
+	var wharbor = L.marker(map.unproject([3973, 1998], map.getMaxZoom()));
+	wharbor.bindPopup('<b>White Harbor</b>');
+	wharbor.on('mouseover', function (e) {this.openPopup();});
+	wharbor.on('mouseout', function (e) {this.closePopup();});
+
+	var bisland = L.marker(map.unproject([3973, 1998], map.getMaxZoom()));
+	bisland.bindPopup('<b>Bear Island</b>');
+	bisland.on('mouseover', function (e) {this.openPopup();});
+	bisland.on('mouseout', function (e) {this.closePopup();});
+
+	var gwatch = L.marker(map.unproject([3973, 1998], map.getMaxZoom()));
+	gwatch.bindPopup('<b>Greywater Watch</b>');
+	gwatch.on('mouseover', function (e) {this.openPopup();});
+	gwatch.on('mouseout', function (e) {this.closePopup();});
+
+	var rills = L.marker(map.unproject([3973, 1998], map.getMaxZoom()));
+	rills.bindPopup('<b>The Rills</b>');
+	rills.on('mouseover', function (e) {this.openPopup();});
+	rills.on('mouseout', function (e) {this.closePopup();});
+
+	var dreadfort = L.marker(map.unproject([3973, 1998], map.getMaxZoom()));
+	dreadfort.bindPopup('<b>Dreadfort</b>');
+	dreadfort.on('mouseover', function (e) {this.openPopup();});
+	dreadfort.on('mouseout', function (e) {this.closePopup();});
+
+	var lhearth = L.marker(map.unproject([3973, 1998], map.getMaxZoom()));
+	lhearth.bindPopup('<b>Last Hearth</b>');
+	lhearth.on('mouseover', function (e) {this.openPopup();});
+	lhearth.on('mouseout', function (e) {this.closePopup();});
+
+	// Lesser Houses
+	
+	
+	*/
+	
+
+// The Stormlands
+var send = L.marker(map.unproject([5190, 6090], map.getMaxZoom()), {icon: send_icon});
+send.bindPopup("<b>House Baratheon</b><br><b>Seat: Storm's End</b>");
+send.on('mouseover', function (e) {this.openPopup();});
+send.on('mouseout', function (e) {this.closePopup();});
+
+/*
+
+	// Greater Houses
+	var barrowton = L.marker(map.unproject([3973, 1998], map.getMaxZoom()));
+	barrowton.bindPopup('<b>Barrowton</b>');
+	barrowton.on('mouseover', function (e) {this.openPopup();});
+	barrowton.on('mouseout', function (e) {this.closePopup();});
+
+	var dmotte = L.marker(map.unproject([3973, 1998], map.getMaxZoom()));
+	dmotte.bindPopup('<b>Deepwood Motte</b>');
+	dmotte.on('mouseover', function (e) {this.openPopup();});
+	dmotte.on('mouseout', function (e) {this.closePopup();});
+
+	var hornwood = L.marker(map.unproject([3973, 1998], map.getMaxZoom()));
+	hornwood.bindPopup('<b>Hornwood</b>');
+	hornwood.on('mouseover', function (e) {this.openPopup();});
+	hornwood.on('mouseout', function (e) {this.closePopup();});
+
+	var karhold = L.marker(map.unproject([3973, 1998], map.getMaxZoom()));
+	karhold.bindPopup('<b>Karhold</b>');
+	karhold.on('mouseover', function (e) {this.openPopup();});
+	karhold.on('mouseout', function (e) {this.closePopup();});
+
+	var wharbor = L.marker(map.unproject([3973, 1998], map.getMaxZoom()));
+	wharbor.bindPopup('<b>White Harbor</b>');
+	wharbor.on('mouseover', function (e) {this.openPopup();});
+	wharbor.on('mouseout', function (e) {this.closePopup();});
+
+	var bisland = L.marker(map.unproject([3973, 1998], map.getMaxZoom()));
+	bisland.bindPopup('<b>Bear Island</b>');
+	bisland.on('mouseover', function (e) {this.openPopup();});
+	bisland.on('mouseout', function (e) {this.closePopup();});
+
+	var gwatch = L.marker(map.unproject([3973, 1998], map.getMaxZoom()));
+	gwatch.bindPopup('<b>Greywater Watch</b>');
+	gwatch.on('mouseover', function (e) {this.openPopup();});
+	gwatch.on('mouseout', function (e) {this.closePopup();});
+
+	var rills = L.marker(map.unproject([3973, 1998], map.getMaxZoom()));
+	rills.bindPopup('<b>The Rills</b>');
+	rills.on('mouseover', function (e) {this.openPopup();});
+	rills.on('mouseout', function (e) {this.closePopup();});
+
+	var dreadfort = L.marker(map.unproject([3973, 1998], map.getMaxZoom()));
+	dreadfort.bindPopup('<b>Dreadfort</b>');
+	dreadfort.on('mouseover', function (e) {this.openPopup();});
+	dreadfort.on('mouseout', function (e) {this.closePopup();});
+
+	var lhearth = L.marker(map.unproject([3973, 1998], map.getMaxZoom()));
+	lhearth.bindPopup('<b>Last Hearth</b>');
+	lhearth.on('mouseover', function (e) {this.openPopup();});
+	lhearth.on('mouseout', function (e) {this.closePopup();});
+
+	// Lesser Houses
+	
+	*/
+	
+	
+
+// Dorne
+var sspear = L.marker(map.unproject([5461, 7396], map.getMaxZoom()), {icon: sspear_icon});
+sspear.bindPopup("<b>House Martell</b><br><b>Seat: Sunspear</b>");
+sspear.on('mouseover', function (e) {this.openPopup();});
+sspear.on('mouseout', function (e) {this.closePopup();});
+
+/*
+
+	// Greater Houses
+	var barrowton = L.marker(map.unproject([3973, 1998], map.getMaxZoom()));
+	barrowton.bindPopup('<b>Barrowton</b>');
+	barrowton.on('mouseover', function (e) {this.openPopup();});
+	barrowton.on('mouseout', function (e) {this.closePopup();});
+
+	var dmotte = L.marker(map.unproject([3973, 1998], map.getMaxZoom()));
+	dmotte.bindPopup('<b>Deepwood Motte</b>');
+	dmotte.on('mouseover', function (e) {this.openPopup();});
+	dmotte.on('mouseout', function (e) {this.closePopup();});
+
+	var hornwood = L.marker(map.unproject([3973, 1998], map.getMaxZoom()));
+	hornwood.bindPopup('<b>Hornwood</b>');
+	hornwood.on('mouseover', function (e) {this.openPopup();});
+	hornwood.on('mouseout', function (e) {this.closePopup();});
+
+	var karhold = L.marker(map.unproject([3973, 1998], map.getMaxZoom()));
+	karhold.bindPopup('<b>Karhold</b>');
+	karhold.on('mouseover', function (e) {this.openPopup();});
+	karhold.on('mouseout', function (e) {this.closePopup();});
+
+	var wharbor = L.marker(map.unproject([3973, 1998], map.getMaxZoom()));
+	wharbor.bindPopup('<b>White Harbor</b>');
+	wharbor.on('mouseover', function (e) {this.openPopup();});
+	wharbor.on('mouseout', function (e) {this.closePopup();});
+
+	var bisland = L.marker(map.unproject([3973, 1998], map.getMaxZoom()));
+	bisland.bindPopup('<b>Bear Island</b>');
+	bisland.on('mouseover', function (e) {this.openPopup();});
+	bisland.on('mouseout', function (e) {this.closePopup();});
+
+	var gwatch = L.marker(map.unproject([3973, 1998], map.getMaxZoom()));
+	gwatch.bindPopup('<b>Greywater Watch</b>');
+	gwatch.on('mouseover', function (e) {this.openPopup();});
+	gwatch.on('mouseout', function (e) {this.closePopup();});
+
+	var rills = L.marker(map.unproject([3973, 1998], map.getMaxZoom()));
+	rills.bindPopup('<b>The Rills</b>');
+	rills.on('mouseover', function (e) {this.openPopup();});
+	rills.on('mouseout', function (e) {this.closePopup();});
+
+	var dreadfort = L.marker(map.unproject([3973, 1998], map.getMaxZoom()));
+	dreadfort.bindPopup('<b>Dreadfort</b>');
+	dreadfort.on('mouseover', function (e) {this.openPopup();});
+	dreadfort.on('mouseout', function (e) {this.closePopup();});
+
+	var lhearth = L.marker(map.unproject([3973, 1998], map.getMaxZoom()));
+	lhearth.bindPopup('<b>Last Hearth</b>');
+	lhearth.on('mouseover', function (e) {this.openPopup();});
+	lhearth.on('mouseout', function (e) {this.closePopup();});
+*/
+	// Lesser Houses
+	
+	
+	
+	
+
+//---- LAYER GROUPS ----//
+var lg_lordp = L.layerGroup([winterfell, klanding, pyke, rrun, eyrie, crock, hgarden, send, sspear]).addTo(map); //Layer group for Lords Paramount and Crown
+
+var lg_ghouse = L.layerGroup([barrowton, dmotte, hornwood, karhold, wharbor, bisland, gwatch, rills, dreadfort, lhearth]);//Layer group for greater noble houses
+
+var lg_lhouse = L.layerGroup([]); //Layer group for lesser noble houses
+
+var lg_drag = L.layerGroup([]); //Layer group for dragon sightings
+
+var lg_rumor = L.layerGroup([]); //Layer group for rumors and events
+
+var lg_army = L.layerGroup([]); //Layer group for armies and naval fleets
+
+var lg_hbord = L.layerGroup([]); //Layer group for House territory borders
+
+var lg_rbord = L.layerGroup([]); //Layer group for region territory borders
+
+var overlays = {
+	"Lords Paramount" : lg_lordp,
+	"Greater Houses" : lg_ghouse,
+	"Lesser Houses" : lg_lhouse,
+	"Dragon Sightings" : lg_drag,
+	"Rumors and Events" : lg_rumor,
+	//"Armies and Navies" : lg_army,
+	//"House Territories" : lg_hbord, - will be a tile layer
+	//"Realm Borders" : lg_rbord, - will be a tile layer
+}
+
+
+// Add Layer Control
+L.control.layers(/*baseLayers*/null, overlays).addTo(map);
+
+
+/*--- Trying to find way to make certain layers show up only at specific zoom levels ----*/
+//if (zoom > 1 && zoom <= 5 ) lg_lordp.addTo(map); else lg_lordp.removeFrom(map);
+
+
+</script>
+
+</body>	
+</html>
